@@ -1,0 +1,91 @@
+Dropbear ialah salah satu jenis SSH server yang popular selain OpenSSH. Dropbear terkenal dengan sifatnya yang lightweight. Secara default, 
+Debian 9 dan Debian 10 hanya akan dapat install Dropbear versi 2014.65 jika download melalui repo seperti biasa. Untuk install Dropbear versi yang baru, 
+kita perlu lakukan installation daripada source.
+
+Install Dropbear
+
+Pertama sekali, install dahulu Dropbear seperti biasa;
+
+apt-get update && apt-get upgrade -y
+
+apt-get install dropbear -y
+##
+Stop Dropbear dan Uninstall
+
+Stop Dropbear
+
+service dropbear stop
+
+Uninstall Dropbear
+
+apt-get remove dropbear
+##
+Upgrade Dropbear
+
+Install dependencies
+
+apt-get install libz-dev -y
+
+Download source Dropbear 2020.81
+
+wget https://mirror.dropbear.nl/mirror/dropbear-2020.81.tar.bz2
+
+Extract dropbear-2020.81.tar.bz2
+
+tar -xvjf dropbear-2020.81.tar.bz2
+
+Build Dropbear dari source
+
+cd dropbear-2020.81/
+./configure
+make && make install
+
+Kita rename Dropbear lama;
+
+mv /usr/sbin/dropbear /usr/sbin/dropbear.old
+ln /usr/local/sbin/dropbear /usr/sbin/dropbear
+
+Akhirnya, kita tetapkan konfigurasi Dropbear;
+
+nano /etc/default/dropbear
+
+Ubah NO_START=1 kepada NO_START=0. Kemudian ubah DROPBEAR_PORT kepada port yang anda ingin gunakan. Sebagai contoh, saya guna port 222.
+# disabled because OpenSSH is installed
+# change to NO_START=0 to enable Dropbear
+NO_START=0
+# the TCP port that Dropbear listens on
+DROPBEAR_PORT=222
+
+# any additional arguments for Dropbear
+DROPBEAR_EXTRA_ARGS=
+
+# specify an optional banner file containing a message to be
+# sent to clients before they connect, such as "/etc/issue.net"
+DROPBEAR_BANNER=
+
+# RSA hostkey file (default: /etc/dropbear/dropbear_rsa_host_key)
+#DROPBEAR_RSAKEY="/etc/dropbear/dropbear_rsa_host_key"
+
+# DSS hostkey file (default: /etc/dropbear/dropbear_dss_host_key)
+#DROPBEAR_DSSKEY="/etc/dropbear/dropbear_dss_host_key"
+
+# ECDSA hostkey file (default: /etc/dropbear/dropbear_ecdsa_host_key)
+#DROPBEAR_ECDSAKEY="/etc/dropbear/dropbear_ecdsa_host_key"
+
+# Receive window size - this is a tradeoff between memory and
+# network performance
+DROPBEAR_RECEIVE_WINDOW=65536
+
+Kemudian, restart Dropbear
+
+service dropbear stop && service dropbear start
+
+atau
+
+service dropbear restart
+
+Untuk semak Dropbear sedang running dan listen pada port 222:
+
+netstat -tlpn
+
+Akhir sekali, jangan lupa masukkan /bin/false pada /etc/shells.
