@@ -1,0 +1,6 @@
+Semak Servis Yang Berjalan Dan Port Yang Sedang Digunakan
+Untuk kita semak servis yang sedang berjalan, dan port apa yang digunakan oleh servis tersebut, gunakan command;
+
+apt-get install net-tools -y
+
+netstat -tlpn
