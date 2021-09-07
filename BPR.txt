@@ -1,0 +1,18 @@
+Bagaimana untuk gunakan BBR?
+
+Edit sysctl.conf
+
+nano /etc/sysctl.conf
+
+Masukkan line berikut;
+
+#BBR 
+net.ipv4.tcp_congestion_control=bbr 
+net.core.default_qdisc=fq 
+
+Kemudian command berikut untuk apply setting sysctl yang baru
+
+sysctl -p
+sysctl --system
+
+Tahniah. Anda kini menggunakan congestion control BBR. Tahukah anda, BBR ini digunakan oleh Google, Youtube, Spotify dan Dropbox??
