@@ -1,0 +1,50 @@
+Squid ialah Proxy Server yang pada asalnya digunakan sebagai “forward proxy”. Squid mempunyai keupayaan untuk caching, melajukan web server, dan beberapa fungsi lain. Untuk pengguna internet yang menggunakan bug untuk mendapatkan internet unlimited, Squid digunakan untuk menghantar custom header request, dalam aplikasi seperti HTTP Injector dan aplikasi yang sama dengannya. Untuk mendapatkan list bug Digi, Maxis dan Umobile, boleh rujuk di sini.
+
+Install Squid
+
+apt-get update && apt get upgrade -y
+
+apt-get install squid
+
+nano /etc/squid/squid.conf
+
+acl myip src 123.124.123.12/32
+acl whitelist dstdomain .digi.com.my .maxis.com.my .ookla.net
+acl ports port 22
+acl ports port 222
+acl ports port 443
+acl CONNECT method CONNECT
+
+via off
+forwarded_for delete
+
+http_access allow CONNECT ports
+http_access allow whitelist
+http_access allow myip
+http_access deny all
+
+visible_hostname Cloudflare
+http_port 8080
+
+
+acl myip src 123.124.123.12/32 ialah untuk menetapkan IP Address server yang kita benarkan untuk mengakses Squid Server
+
+acl whitelist dstdomain ialah untuk menetapkan domain / subdomain apa yang kita benarkan untuk digunakan. Letakkan bug anda di sini.
+
+acl ports port adalah untuk kita tetapkan port tertentu yang boleh guna method CONNECT
+
+via off
+forwarded_for delete
+
+kedua-dua baris ini ialah untuk anonymity. 
+
+http_access allow CONNECT ports
+ - kita benarkan method CONNECT pada port yang kita senaraikan
+http_access allow whitelist
+ - kita benarkan subdomain / domain bug
+http_access allow myip
+ - kita benarkan IP server SSH
+http_access deny all
+ - akhir sekali, kita deny semua selain yang kita benarkan. Ini amat penting untuk elakkan server Squid anda disalahgunakan oleh orang lain.
+
+http_port 8080 - ini bermaksud, Squid akan berjalan pada port 8080
