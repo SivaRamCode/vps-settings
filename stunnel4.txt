@@ -1,0 +1,80 @@
+Apa Itu Stunnel?
+Stunnel ialah suatu aplikasi yang membolehkan tunnel dari suatu klien ke server menggunakan TLS encryption. 
+Ini membolehkan tunneling SSH dapat disembunyikan dan hanya menunjukkan data TLS.
+
+Sebagai contoh, jika menggunakan HTTP Injector dengan Squid dan SSH:
+
+GET http://bug.digi.com.my HTTP/1.1
+Host: bug.digi.com.my
+
+CONNECT 123.21.456.21:1194 HTTP/1.0
+
+HTTP/1.1 200 Connection established
+
+SSH 2.0 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Dapat dilihat “SSH 2.0” bukan? Jika menggunakan Stunnel, ianya akan kelihatan seperti berikut, di mana, jika di analisis packet anda, 
+semuanya encrypted seperti HTTPS connection;
+
+Oleh itu, jika anda menggunakan Stunnel + SSH, anda tidak perlu menggunakan Squid. Kerana, di depan SSH itu ialah Stunnel yang menggunakan HTTPS. 
+Jangan lupa, di HTTP Injector, masukkan bug SNI anda.
+
+Berikut adalah cara-cara untuk install Stunnel di Debian 9. Tetapi sebelum itu, untuk memudahkan tutorial ini, kita buat assumption bahawa;
+
+Port SSH anda: 1194
+
+Tiada aplikasi lain yang menggunakan Port 443
+##
+Install Stunnel4
+
+apt-get update && apt-get upgrade -y
+
+apt-get install -y stunnel4
+##
+Konfigurasi Stunnel4
+
+Pertama sekali, kita generate certificate dahulu untuk kegunaan stunnel;
+
+openssl genrsa -out key.pem 2048
+
+openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+
+cat key.pem cert.pem >> /etc/stunnel/stunnel.pem
+##
+Kemudian, kita ubah setting stunnel;
+
+nano /etc/stunnel/stunnel.conf
+
+cert = /etc/stunnel/stunnel.pem
+client = no
+socket = a:SO_REUSEADDR=1
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+connect = 127.0.0.1:1194
+accept = 443
+##
+Kemudian,
+
+nano /etc/default/stunnel4
+
+# /etc/default/stunnel
+# Julien LEMOINE <speedblue@debian.org>
+# September 2003
+
+# Change to one to enable stunnel automatic startup
+ENABLED=1
+FILES="/etc/stunnel/*.conf"
+OPTIONS=""
+
+# Change to one to enable ppp restart scripts
+PPP_RESTART=0
+
+####
+Kemudian, untuk mulakan stunnel;
+
+/etc/init.d/stunnel4 start
+
+Untuk semak stunnel telah berjalan di port 443;
+
+netstat -tlpn
